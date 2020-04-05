@@ -4,22 +4,28 @@ using UnityEngine;
 using UnityEditor;
 using UnityEngine.UIElements;
 using UnityEditor.UIElements;
+using UnityEditor.Experimental.GraphView;
 
 public class DialogueGraph : EditorWindow
 {
     private DialogueGraphView _graphView;
+    private NodeSearchWindow _searchWindow;
     private string _fileName = "New Narrative";
 
     [MenuItem("Tool/Open DialogueGraph")]
     public static void Open() {
         var window = GetWindow<DialogueGraph>();
         window.titleContent = new GUIContent("Dialogue Graph");
+        Debug.Log("Open Window");
     }
 
     private void OnEnable()
     {
         ConstructGraphView();
         GenerateToolbar();
+        GenerateMiniMap();
+        //GenerateBlackBoard();
+        GenerateSearchWindow();
     }
 
     private void ConstructGraphView() {
@@ -27,8 +33,6 @@ public class DialogueGraph : EditorWindow
         {
             name = "Dialogue Graph"
         };
-
-        _graphView.StretchToParentSize();
 
         rootVisualElement.Add(_graphView);
     }
@@ -42,33 +46,58 @@ public class DialogueGraph : EditorWindow
         fileNameTextField.RegisterValueChangedCallback(evt => _fileName = evt.newValue);
         toolbar.Add(fileNameTextField);
 
-        var nodeCreateButton = new Button(() => { _graphView.CreateNode("Dialogue Node"); })
-        {
-            text = "Create Node"
-        };
-        toolbar.Add(nodeCreateButton);
-
-        toolbar.Add(new Button(() => RequestDataOperation(true)) { text = "Save"});
+        toolbar.Add(new Button(() => RequestDataOperation(true)) { text = "Save" });
         toolbar.Add(new Button(() => RequestDataOperation(false)) { text = "Load" });
 
+        toolbar.Add(new Button(() => CleaGraph()) { text = "Clear Graph" });
 
         rootVisualElement.Add(toolbar);
     }
+    private void GenerateMiniMap()
+    {
+        var miniMap = new MiniMap();
+        miniMap.anchored = false;//可以随意拖拽移动
 
-    void RequestDataOperation(bool save) {
+        var cords = _graphView.contentViewContainer.WorldToLocal(new Vector2(this.maxSize.x - 10,30));
+        miniMap.SetPosition(new Rect(cords.x, cords.y, 200, 150));
+        _graphView.Add(miniMap);
+    }
+    private void GenerateSearchWindow()
+    {
+        _searchWindow = ScriptableObject.CreateInstance<NodeSearchWindow>();
+        _searchWindow.Init(_graphView, this);
+        //侦听创建节点请求事件，空格键或右键
+        _graphView.nodeCreationRequest = ctx => SearchWindow.Open(new SearchWindowContext(ctx.screenMousePosition), _searchWindow);
+    }
+    /*
+    private void GenerateBlackBoard() {
+        var blackboard = new Blackboard(_graphView);
+        blackboard.Add(new BlackboardSection { title = "全局变量" });
+        blackboard.addItemRequested = _blackboard => { _graphView.AddPropertyToBlackBoard(new ExposedProperty()); };
+        
+        blackboard.SetPosition(new Rect(10,30,200,300));
+        //_graphView.Blackboard = blackboard;
+        _graphView.Add(blackboard);
+        
+    }
+    */
+    private void RequestDataOperation(bool save) {
 
         if (string.IsNullOrEmpty(_fileName)) {
-            EditorUtility.DisplayDialog("无效文件名","请输入有效文件名","确定");
+            EditorUtility.DisplayDialog("无效文件名", "请输入有效文件名", "确定");
             return;
         }
-
-        var saveUtility = GraphSaveUtility.GetInstance(_graphView);
+        
         if (save)
         {
-            saveUtility.SaveGraph(_fileName);
+            GraphSaveUtility.SaveGraph(_fileName, _graphView);
         }
         else {
-            saveUtility.LoadGraph(_fileName);
+            GraphSaveUtility.LoadGraph(_fileName, _graphView);
         }
+    }
+
+    private void CleaGraph() {
+        GraphSaveUtility.ClearGraph(_graphView);
     }
 }
