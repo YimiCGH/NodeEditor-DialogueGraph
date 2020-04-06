@@ -5,6 +5,7 @@ using UnityEditor;
 using UnityEngine.UIElements;
 using UnityEditor.UIElements;
 using UnityEditor.Experimental.GraphView;
+using System.Linq;
 
 public class DialogueGraph : EditorWindow
 {
@@ -16,7 +17,6 @@ public class DialogueGraph : EditorWindow
     public static void Open() {
         var window = GetWindow<DialogueGraph>();
         window.titleContent = new GUIContent("Dialogue Graph");
-        Debug.Log("Open Window");
     }
 
     private void OnEnable()
@@ -24,7 +24,7 @@ public class DialogueGraph : EditorWindow
         ConstructGraphView();
         GenerateToolbar();
         GenerateMiniMap();
-        //GenerateBlackBoard();
+        GenerateBlackBoard();
         GenerateSearchWindow();
     }
 
@@ -69,18 +69,32 @@ public class DialogueGraph : EditorWindow
         //侦听创建节点请求事件，空格键或右键
         _graphView.nodeCreationRequest = ctx => SearchWindow.Open(new SearchWindowContext(ctx.screenMousePosition), _searchWindow);
     }
-    /*
+    
     private void GenerateBlackBoard() {
         var blackboard = new Blackboard(_graphView);
         blackboard.Add(new BlackboardSection { title = "全局变量" });
         blackboard.addItemRequested = _blackboard => { _graphView.AddPropertyToBlackBoard(new ExposedProperty()); };
-        
+
+        blackboard.editTextRequested = (_blackboard, _element, _newValue) => {
+            var oldPropertyName = ((BlackboardField)_element).text;
+            if (_graphView.Exposedproperties.Any(x => x.PropertyName == _newValue))
+            {
+                EditorUtility.DisplayDialog("Error", "已存在同样的名称，请选择其他名称", "确定");
+            }
+            else {
+                //应用新的名称
+                ((BlackboardField)_element).text = _newValue;
+                //把存储列表中的变量名称也改为新的名称
+                var propertyIndex = _graphView.Exposedproperties.FindIndex(x => x.PropertyName == oldPropertyName);
+                _graphView.Exposedproperties[propertyIndex].PropertyName = _newValue;
+            }
+        };
+
         blackboard.SetPosition(new Rect(10,30,200,300));
-        //_graphView.Blackboard = blackboard;
+        _graphView.Blackboard = blackboard;
         _graphView.Add(blackboard);
         
     }
-    */
     private void RequestDataOperation(bool save) {
 
         if (string.IsNullOrEmpty(_fileName)) {

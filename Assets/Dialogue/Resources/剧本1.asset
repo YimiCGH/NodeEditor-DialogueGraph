@@ -15,36 +15,29 @@ MonoBehaviour:
   NodeLinks:
   - FromNodeGuid: 
     PortName: Next
-    ToNodeGuid: e34fea20-208f-4bf9-a3a4-83520c341008
-  - FromNodeGuid: e34fea20-208f-4bf9-a3a4-83520c341008
-    PortName: Choice 1
-    ToNodeGuid: 3dc4f375-8370-4114-b0f8-e294ce602e79
-  - FromNodeGuid: e34fea20-208f-4bf9-a3a4-83520c341008
-    PortName: Choice 2
-    ToNodeGuid: 38dad592-859a-41b1-bf2c-28d1b04a58e2
-  - FromNodeGuid: e34fea20-208f-4bf9-a3a4-83520c341008
-    PortName: Choice 3
-    ToNodeGuid: b37ae52e-57dc-447e-a7e2-743d60156820
-  - FromNodeGuid: b37ae52e-57dc-447e-a7e2-743d60156820
-    PortName: Choice 1
-    ToNodeGuid: 38dad592-859a-41b1-bf2c-28d1b04a58e2
-  - FromNodeGuid: 3dc4f375-8370-4114-b0f8-e294ce602e79
-    PortName: Choice 2
-    ToNodeGuid: 38dad592-859a-41b1-bf2c-28d1b04a58e2
+    ToNodeGuid: b96b4134-3915-4d16-b7e5-967fd03e03f1
+  - FromNodeGuid: b96b4134-3915-4d16-b7e5-967fd03e03f1
+    PortName: nice to meet you!
+    ToNodeGuid: 704b632b-6e6b-4fad-8b7b-d0a2a32607ad
+  - FromNodeGuid: b96b4134-3915-4d16-b7e5-967fd03e03f1
+    PortName: Bye
+    ToNodeGuid: 66a65a3e-5b07-4ad2-be35-c10c1b8811b4
   DialogueNodeData:
-  - Guid: e34fea20-208f-4bf9-a3a4-83520c341008
-    DialogueText: Dialogue Node
-    Position: {x: 345, y: 201}
-  - Guid: b37ae52e-57dc-447e-a7e2-743d60156820
-    DialogueText: Dialogue Node
-    Position: {x: 628, y: 442}
-  - Guid: 3dc4f375-8370-4114-b0f8-e294ce602e79
-    DialogueText: Dialogue Node
-    Position: {x: 687, y: 129}
-  - Guid: 38dad592-859a-41b1-bf2c-28d1b04a58e2
-    DialogueText: Dialogue Node
-    Position: {x: 1007, y: 225}
+  - Guid: b96b4134-3915-4d16-b7e5-967fd03e03f1
+    DialogueText: hi,i'm yimi.nice to meet you!
+    Position: {x: 395, y: 201}
+  - Guid: 66a65a3e-5b07-4ad2-be35-c10c1b8811b4
+    DialogueText: 555
+    Position: {x: 740, y: 309}
+  - Guid: 704b632b-6e6b-4fad-8b7b-d0a2a32607ad
+    DialogueText: welcom to my world!
+    Position: {x: 739, y: 166}
+  Exposedproperties:
+  - PropertyName: Charater 1
+    PropertyValue: Yimi
+  - PropertyName: Charater 2
+    PropertyValue: Lucy
   EntryNodeData:
     Guid: 
     DialogueText: 
-    Position: {x: 0, y: 0}
+    Position: {x: 240, y: 200}

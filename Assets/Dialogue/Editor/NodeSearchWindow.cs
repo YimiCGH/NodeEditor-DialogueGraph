@@ -42,8 +42,7 @@ public class NodeSearchWindow : ScriptableObject, ISearchWindowProvider
         var localMousePos = _graphView.contentContainer.WorldToLocal(worldMousePos);
 
         switch (SearchTreeEntry.userData) {
-            case DialogueNode dialogueNode:
-                Debug.Log("创建节点");
+            case DialogueNode dialogueNode:                
                 _graphView.CreateNode("Diaogue Node", localMousePos);                
                 return true;
             default:

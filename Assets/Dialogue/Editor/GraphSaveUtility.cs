@@ -17,6 +17,8 @@ public class GraphSaveUtility
         }
 
         var dialogueContainer = ScriptableObject.CreateInstance<DialogueContainer>();
+        
+        //Save Edges
         var connectedPorts = edges.Where(x => x.input.node != null).ToArray();
 
         for (int i = 0; i < connectedPorts.Length; i++)
@@ -30,24 +32,29 @@ public class GraphSaveUtility
                 ToNodeGuid = inputNode.GUID
             });
         }
-
+        //Save Nodes
         var nodes = targetGraphView.nodes.ToList().Cast<DialogueNode>().ToList();
 
-        foreach (var dialogueNode in nodes.Where(node => !node.EntryPoint)){
+        foreach (var dialogueNode in nodes){
 
             if (dialogueNode.EntryPoint){
                 dialogueContainer.EntryNodeData = dialogueNode.Save();
+                Debug.Log($"Save Entry Point {dialogueContainer.EntryNodeData}");
             }
             else {
                 dialogueContainer.DialogueNodeData.Add(dialogueNode.Save());
             }
         }
 
-        if (!AssetDatabase.IsValidFolder("Assets/Resources")) {
-            AssetDatabase.CreateFolder("Assets", "Resources");
+        //Save Blackboard
+        dialogueContainer.Exposedproperties.AddRange(targetGraphView.Exposedproperties);
+
+
+        if (!AssetDatabase.IsValidFolder("Assets/Dialogue/Resources")) {
+            AssetDatabase.CreateFolder("Assets/Dialogue", "Resources");
         }
 
-        AssetDatabase.CreateAsset(dialogueContainer,$"Assets/Resources/{_fileName}.asset");
+        AssetDatabase.CreateAsset(dialogueContainer,$"Assets/Dialogue/Resources/{_fileName}.asset");
         AssetDatabase.SaveAssets();
     }
 
@@ -61,6 +68,7 @@ public class GraphSaveUtility
         ClearGraph(graphView);
         CreateNodes(graphView, graphDataCache);
         ConnectNodes(graphView, graphDataCache);
+        LoadBlackBoard(graphView, graphDataCache);
     }
     public static void ClearGraph(DialogueGraphView graph) {
         var Nodes = graph.nodes.ToList().Cast<DialogueNode>().ToList();
@@ -115,11 +123,10 @@ public class GraphSaveUtility
 
         for (int i = 0; i < nodes.Count; i++)
         {
-            var cuNode = nodes[i];
-
+            var curNode = nodes[i];
             //找到所有从此节点开始的连线
             var connections = dialogueContainer.NodeLinks
-                .Where(x=>x.FromNodeGuid == cuNode.GUID)
+                .Where(x=>x.FromNodeGuid == curNode.GUID)
                 .ToList();
 
             for (int j = 0; j < connections.Count; j++)
@@ -129,7 +136,7 @@ public class GraphSaveUtility
                 var targetNode = nodes.First( x => x.GUID == targetNodeGuid);
 
                 LinkNodes(graphView,
-                    cuNode.outputContainer[j].Q<Port>(),
+                    curNode.outputContainer[j].Q<Port>(),
                     (Port) targetNode.inputContainer[0]);
                 //获取端口的两种表示方法
             }
@@ -148,7 +155,14 @@ public class GraphSaveUtility
 
         graphView.Add(tempEdge);
     }
-  
 
-    
+
+    private static void LoadBlackBoard(DialogueGraphView graphView, DialogueContainer dialogueContainer) {
+        graphView.ClearBlackbBoardAndExposedProperties();
+
+        foreach (var exposedProperty in dialogueContainer.Exposedproperties)
+        {
+            graphView.AddPropertyToBlackBoard(exposedProperty);
+        }
+    }
 }

@@ -12,9 +12,9 @@ public class DialogueGraphView : GraphView
 {
     public static readonly Vector2 DefaultNodeSize = new Vector2(150,200);
     public DialogueNode EntryNode;
-    //public Blackboard Blackboard;
+    public Blackboard Blackboard;
 
-    //private List<ExposedProperty> _properties = new List<ExposedProperty>();
+    public List<ExposedProperty> Exposedproperties = new List<ExposedProperty>();
 
     private StyleSheet _graphUss;
     private StyleSheet _nodeUss;
@@ -62,9 +62,6 @@ public class DialogueGraphView : GraphView
 
     private DialogueNode GenerateEntryPointNode() {
         var node = DialogueNode.CreateNode("Start", "ENTRYPOINT",true);
-
-        node.SetPosition(new Rect(100,200,100,100));
-
         var generatedPort = GeneratePort(node,Direction.Output);
         generatedPort.portName = "Next";
         node.outputContainer.Add(generatedPort);
@@ -75,6 +72,7 @@ public class DialogueGraphView : GraphView
 
         node.RefreshExpandedState();
         node.RefreshPorts();
+        node.SetPosition(new Rect(240, 200, 100, 100));
 
         EntryNode = node;
 
@@ -206,22 +204,36 @@ public class DialogueGraphView : GraphView
     #endregion
 
     #region Blackboard
-    /*
-    public void AddPropertyToBlackBoard(ExposedProperty exposedProperty) {
-        var property = new ExposedProperty();
-        property.PropertyName = exposedProperty.PropertyName;
-        property.PropertyValue = exposedProperty.PropertyValue;
 
-        //_properties.Add(property);
+    public void ClearBlackbBoardAndExposedProperties() {
+        Exposedproperties.Clear();
+        Blackboard.Clear();
+    }
+
+    public void AddPropertyToBlackBoard(ExposedProperty exposedProperty) {
+
+        var tempPropertyName = exposedProperty.PropertyName;
+        var tempPropertyVale = exposedProperty.PropertyValue;
+
+        while (Exposedproperties.Any(x => x.PropertyName == tempPropertyName)) {
+            tempPropertyName = $"{tempPropertyName}(1)";//UserName(1) || UserName(1)(1)(1) 等等
+        }
+
+        var property = new ExposedProperty();
+        property.PropertyName = tempPropertyName;
+        property.PropertyValue = tempPropertyVale;
+
+        Exposedproperties.Add(property);
 
 
         var container = AddStringType(property);
 
-        //Blackboard.Add(container);
+        Blackboard.Add(container);
     }
 
 
-    VisualElement AddStringType(ExposedProperty property) {
+    VisualElement AddStringType(ExposedProperty property) 
+    {
         var container = new VisualElement();
         var blackboardField = new BlackboardField
         {
@@ -235,8 +247,8 @@ public class DialogueGraphView : GraphView
         };
         propertyValueTextFeld.RegisterValueChangedCallback(
             evt => {
-                var changeIndex = _properties.FindIndex(x => x.PropertyName == property.PropertyName);
-                _properties[changeIndex].PropertyValue = evt.newValue;
+                var changeIndex = Exposedproperties.FindIndex(x => x.PropertyName == property.PropertyName);
+                Exposedproperties[changeIndex].PropertyValue = evt.newValue;
             }
             );
 
@@ -246,6 +258,6 @@ public class DialogueGraphView : GraphView
 
         return container;
     }
-*/
+
     #endregion
 }
